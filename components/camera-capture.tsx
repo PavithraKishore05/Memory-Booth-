@@ -36,6 +36,7 @@ export function CameraCapture({ filter, onComplete, shots = 4 }: Props) {
   const [shooting, setShooting] = useState(false)
   const [captured, setCaptured] = useState<string[]>([])
   const [flash, setFlash] = useState(false)
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user")
   const [mirror, setMirror] = useState(true)
 
   const filterCss = FILTERS.find((f) => f.id === filter)?.css ?? "none"
@@ -59,9 +60,13 @@ export function CameraCapture({ filter, onComplete, shots = 4 }: Props) {
       return
     }
     try {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop())
+        streamRef.current = null
+      }
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: "user",
+          facingMode: facingMode,
           width: { ideal: 1920 },
           height: { ideal: 1080 },
           frameRate: { ideal: 30 },
@@ -96,7 +101,7 @@ export function CameraCapture({ filter, onComplete, shots = 4 }: Props) {
         )
       }
     }
-  }, [])
+  }, [facingMode])
 
   useEffect(() => {
     startCamera()
@@ -269,11 +274,11 @@ export function CameraCapture({ filter, onComplete, shots = 4 }: Props) {
       </div>
 
       {/* controls */}
-      <div className="mx-auto flex w-full max-w-[280px] flex-col gap-4 sm:max-w-xs">
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1">
-            <span className="px-2 text-muted-foreground">
-              <Timer className="size-4" />
+      <div className="mx-auto flex w-full max-w-[280px] flex-col gap-3 sm:max-w-xs">
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className="flex items-center gap-0.5 rounded-full border border-border bg-card p-0.5">
+            <span className="px-1.5 text-muted-foreground">
+              <Timer className="size-3.5" />
             </span>
             {COUNTDOWN_OPTIONS.map((opt) => (
               <button
@@ -281,7 +286,7 @@ export function CameraCapture({ filter, onComplete, shots = 4 }: Props) {
                 onClick={() => setCountdownLength(opt)}
                 disabled={shooting}
                 className={cn(
-                  "rounded-full px-2.5 py-1.5 text-xs font-medium transition-colors disabled:opacity-50",
+                  "rounded-full px-2 py-1 text-[11px] font-medium transition-colors disabled:opacity-50",
                   countdownLength === opt
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground",
@@ -293,12 +298,28 @@ export function CameraCapture({ filter, onComplete, shots = 4 }: Props) {
           </div>
 
           <button
+            onClick={() => {
+              setFacingMode((f) => {
+                const next = f === "user" ? "environment" : "user"
+                setMirror(next === "user")
+                return next
+              })
+            }}
+            disabled={shooting}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1.5 text-[11px] font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+            title="Switch between front and back camera"
+          >
+            <RefreshCw className="size-3.5" />
+            {facingMode === "user" ? "Front" : "Back"}
+          </button>
+
+          <button
             onClick={() => setMirror((m) => !m)}
             disabled={shooting}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1.5 text-[11px] font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+            title="Mirror preview image"
           >
-            <RefreshCw className="size-4" />
-            {mirror ? "Mirrored" : "Normal"}
+            {mirror ? "Mirror" : "Normal"}
           </button>
         </div>
 
