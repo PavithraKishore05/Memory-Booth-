@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation"
 import { useRef, useState } from "react"
-import { Sparkles, ArrowRight, RotateCcw } from "lucide-react"
+import Link from "next/link"
+import { Sparkles, ArrowRight, RotateCcw, ChevronLeft } from "lucide-react"
 import { SiteNav } from "@/components/site-nav"
 import { CameraCapture } from "@/components/camera-capture"
 import { PhotoStrip } from "@/components/photo-strip"
@@ -84,15 +85,25 @@ export default function BoothPage() {
       <SiteNav />
 
       <section className="mx-auto max-w-6xl px-5 pt-10">
-        <div className="text-center">
-          <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl">
-            {hasPhotos ? "Decorate your strip" : "Step into the booth❤️"}
-          </h1>
-          <p className="mx-auto mt-2 max-w-md text-muted-foreground">
-            {hasPhotos
-              ? "Pick a filter, choose a frame, and drag cute stickers onto your strip."
-              : "Choose a filter, then take four photos. We'll stitch them into a cute strip."}
-          </p>
+        <div className="relative flex flex-col items-center gap-4 text-center md:block mb-8">
+          <div className="flex justify-start md:absolute md:left-0 md:top-1/2 md:-translate-y-1/2">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-muted-foreground shadow-sm transition-colors hover:text-foreground hover:bg-muted"
+            >
+              <ChevronLeft className="size-4" /> Back
+            </Link>
+          </div>
+          <div className="mx-auto max-w-xl text-center">
+            <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl">
+              {hasPhotos ? "Decorate your strip" : "Step into the booth❤️"}
+            </h1>
+            <p className="mx-auto mt-2 max-w-md text-muted-foreground">
+              {hasPhotos
+                ? "Pick a filter, choose a frame, and drag cute stickers onto your strip."
+                : "Choose a filter, then take four photos. We'll stitch them into a cute strip."}
+            </p>
+          </div>
         </div>
 
         {!hasPhotos ? (

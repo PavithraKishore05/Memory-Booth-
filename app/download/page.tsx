@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Download, Share2, Camera, ArrowLeft, Check } from "lucide-react"
+import { Download, Share2, Camera, ArrowLeft, Check, BookOpen } from "lucide-react"
 import { SiteNav } from "@/components/site-nav"
 import { PhotoStrip } from "@/components/photo-strip"
 import { useBooth } from "@/components/booth-provider"
@@ -11,7 +11,7 @@ import { renderStrip, downloadDataUrl } from "@/lib/render-strip"
 
 export default function DownloadPage() {
   const router = useRouter()
-  const { state, ready } = useBooth()
+  const { state, ready, reset } = useBooth()
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState(false)
   const [shareMsg, setShareMsg] = useState("")
@@ -99,9 +99,9 @@ export default function DownloadPage() {
           </p>
         </div>
 
-        <div className="mt-12 grid items-start gap-8 md:grid-cols-2">
+        <div className="mt-12 grid items-center gap-8 md:grid-cols-2">
           {/* preview */}
-          <div className="flex justify-center">
+          <div className="flex justify-center h-[520px] sm:h-[600px] lg:h-[680px]">
             <div className="origin-top rotate-[-2deg] scale-[0.48] sm:scale-[0.55] lg:scale-[0.62]">
               <PhotoStrip
                 photos={state.photos}
@@ -115,55 +115,90 @@ export default function DownloadPage() {
           </div>
 
           {/* actions */}
-          <div className="flex flex-col gap-2 md:pt-6">
-            <button
-              onClick={handleDownload}
-              disabled={busy}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-sm transition-transform enabled:hover:scale-[1.02] enabled:active:scale-95 disabled:opacity-60"
-            >
-              {done ? (
-                <>
-                  <Check className="size-5" /> Saved!
-                </>
-              ) : (
-                <>
-                  <Download className="size-5" />
-                  {busy ? "Preparing…" : "Download strip (HD)"}
-                </>
-              )}
-            </button>
-
-            <button
-              onClick={handleShare}
-              disabled={busy}
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-60"
-            >
-              <Share2 className="size-5" />
-              Share
-            </button>
-
-            {shareMsg && (
-              <p className="text-center text-sm text-muted-foreground">
-                {shareMsg}
+          <div className="mx-auto flex w-full max-w-sm flex-col items-center text-center md:pt-4">
+            {/* Header section */}
+            <div className="mb-4 flex flex-col items-center">
+              <span className="text-3xl animate-pulse">💓</span>
+              <h2 className="mt-2 font-heading text-2xl font-bold text-foreground">
+                Love this memory?
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Save it, share it, keep it forever.
               </p>
-            )}
+            </div>
 
-            <div className="mt-1 flex flex-col gap-2 sm:flex-row">
-              <Link
-                href="/booth"
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+            {/* Buttons stack */}
+            <div className="flex w-full flex-col gap-2.5">
+              <button
+                onClick={handleDownload}
+                disabled={busy}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-sm transition-transform enabled:hover:scale-[1.02] enabled:active:scale-95 disabled:opacity-60 cursor-pointer"
               >
-                <ArrowLeft className="size-4" /> Edit again
-              </Link>
-              <Link
-                href="/booth"
-                onClick={() => {
-                  // fresh start handled on booth via retake; keep simple
-                }}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                {done ? (
+                  <>
+                    <Check className="size-5" /> Saved!
+                  </>
+                ) : (
+                  <>
+                    <Download className="size-5" />
+                    {busy ? "Preparing…" : "Download strip (HD)"}
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={handleShare}
+                disabled={busy}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-60 cursor-pointer"
               >
-                <Camera className="size-4" /> New strip
+                <Share2 className="size-5" />
+                Share
+              </button>
+
+              {shareMsg && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {shareMsg}
+                </p>
+              )}
+
+              {/* Divider */}
+              <div className="my-2 flex items-center gap-3 w-full">
+                <hr className="flex-1 border-t border-border/80" />
+                <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">or</span>
+                <hr className="flex-1 border-t border-border/80" />
+              </div>
+
+              {/* Add to Memory Book button */}
+              <Link
+                href="/memory-book"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary/20 bg-card px-7 py-3.5 text-sm font-semibold text-primary transition-all hover:bg-primary/5 hover:border-primary hover:scale-[1.02] active:scale-95"
+              >
+                <BookOpen className="size-4" />
+                Add to Memory Book &rarr;
               </Link>
+              
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Keep journaling your beautiful days.
+              </p>
+
+              {/* Secondary Navigation */}
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row w-full">
+                <Link
+                  href="/booth"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                >
+                  <ArrowLeft className="size-4" /> Edit again
+                </Link>
+                <button
+                  onClick={() => {
+                    reset()
+                    router.push("/booth")
+                  }}
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted cursor-pointer"
+                >
+                  <Camera className="size-4" /> New strip
+                </button>
+              </div>
             </div>
           </div>
         </div>
